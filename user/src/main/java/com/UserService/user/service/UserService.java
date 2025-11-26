@@ -11,10 +11,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
 
     public User register(RegistrationDTO registrationDto) {
-        if (usernameExist(registrationDto.getUsername())){
+      /*  if (usernameExist(registrationDto.getUsername())){
             throw new RuntimeException("Username already exist");
         }
         if (emailExist(registrationDto.getEmail())){
@@ -26,8 +27,8 @@ public class UserService {
 
         if (NationalIdExist(registrationDto.getNationalId())){
             throw new RuntimeException("National id already used");
-        }
-        User user= UserMapper.Instance.userDTOToUser(registrationDto);
+        }*/
+        User user= userMapper.toEntity(registrationDto);
 
         return userRepository.save(user);
     }
