@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class RegistrationDto {
+public class RegistrationDTO {
     @NotBlank(message = "Username require ")
     @Size(min = 4, max = 20, message = "Username must be between 4 and 20")
     private String username;
