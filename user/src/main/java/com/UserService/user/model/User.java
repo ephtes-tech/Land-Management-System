@@ -4,13 +4,17 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class User {
     @Id
@@ -42,15 +46,17 @@ public class User {
     @Column(nullable = false)
     private String address;
 
+    @Builder.Default
     @Column(nullable = false)
     private String role="USER";
 
+    @Builder.Default
     @Column(nullable = false)
     private String status="PENDING_VERIFICATION";
 
+    @Builder.Default
     @Column(nullable = false)
     private LocalDateTime createdAt=LocalDateTime.now();
-
 
     @Column(unique = true, nullable = false, length = 12)
     private String nationalId;
