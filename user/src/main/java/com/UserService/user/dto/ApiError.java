@@ -1,4 +1,4 @@
-package com.UserService.user.exception;
+package com.UserService.user.dto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +13,7 @@ public class ApiError {
     private int status;
     private String message;
     private String path;
+    private String error;
     private String code;
     private Map<String, String> fieldErrors;
-
 }
