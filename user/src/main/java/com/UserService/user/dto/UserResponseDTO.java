@@ -14,8 +14,6 @@ public class UserResponseDTO {
 
     private String email;
 
-    private String password;
-
     private String firstName;
 
     private String middleName;
@@ -30,7 +28,6 @@ public class UserResponseDTO {
 
     private String role;
 
-    private LocalDateTime localDateTime;
 
     private String phoneNumber;
 

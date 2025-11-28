@@ -39,8 +39,6 @@ public class UserMapper {
                 .role(user.getRole())
                 .status(user.getStatus())
                 .nationalId(user.getNationalId())
-                .password(user.getPassword())
-                .localDateTime(user.getCreatedAt())
                 .build();
     }
 }

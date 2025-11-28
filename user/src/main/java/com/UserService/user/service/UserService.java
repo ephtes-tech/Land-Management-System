@@ -2,10 +2,14 @@ package com.UserService.user.service;
 
 import com.UserService.user.dto.RegistrationDTO;
 
+import com.UserService.user.dto.UpdateUserDto;
 import com.UserService.user.dto.UserResponseDTO;
 import com.UserService.user.exception.DuplicateResourceException;
+import com.UserService.user.exception.NotFoundException;
 import com.UserService.user.mapper.UserMapper;
 import com.UserService.user.model.User;
+import com.UserService.user.model.UserUpdateRequest;
+import com.UserService.user.repo.UpdateRepo;
 import com.UserService.user.repo.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +17,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UpdateRepo updateRepo;
 
     @Transactional
     public UserResponseDTO register(RegistrationDTO dto) {
@@ -39,25 +45,28 @@ public class UserService {
         return UserMapper.toResponse(saved);
     }
 
-
-    public User dtoToEntity(RegistrationDTO dto){
-
-        User user=new User();
-        user.setUsername(dto.getUsername());
-        user.setPassword(dto.getPassword());
-        user.setEmail(dto.getEmail());
-        user.setFirstName(dto.getFirstName());
-        user.setMiddleName(dto.getMiddleName());
-        user.setLastName(dto.getLastName());
-        user.setAddress(dto.getAddress());
-        user.setNationalId(dto.getNationalId());
-        user.setPhoneNumber(dto.getPhoneNumber());
-        user.setCreatedAt(LocalDateTime.now());
-
-        user.setRole("USER");
-        user.setStatus("PENDING_VERIFICATION");
-        return user;
+    public UserResponseDTO getUserById(Long id){
+        User user=userRepository.findById(id)
+                .orElseThrow(()->new NotFoundException("User Not Found"));
+        return UserMapper.toResponse(user);
     }
+
+    public String updateUserDto(Long id,UpdateUserDto dto){
+        UserUpdateRequest ur=new UserUpdateRequest();
+        User user=userRepository.findById(id).orElseThrow(
+                ()->new NotFoundException("User not found"));
+        ur.setId(user.getUserId());
+        ur.setFirstName(dto.getFirstName());
+        ur.setMiddleName(dto.getMiddleName());
+        ur.setPhoneNumber(dto.getPhoneNumber());
+        ur.setNationalId(dto.getNationalId());
+        ur.setLastName(dto.getLastName());
+        ur.setAddress(dto.getAddress());
+        ur.setLocalDateTime(LocalDateTime.now());
+        updateRepo.save(ur);
+        return "Successful Update";
+    }
+
 
     public boolean usernameExist(String username){
         return userRepository.existsByUsername(username);
