@@ -1,6 +1,7 @@
 package com.UserService.user.controller;
 
 import com.UserService.user.dto.RegistrationDTO;
+import com.UserService.user.dto.UserResponseDTO;
 import com.UserService.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody RegistrationDTO registrationDto){
-        userService.register(registrationDto);
-        return ResponseEntity.ok("Successful saved");
+    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody RegistrationDTO registrationDto){
+        UserResponseDTO dto=userService.register(registrationDto);
+        return ResponseEntity.ok(dto);
     }
 }

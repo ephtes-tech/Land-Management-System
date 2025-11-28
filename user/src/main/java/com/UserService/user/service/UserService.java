@@ -2,6 +2,9 @@ package com.UserService.user.service;
 
 import com.UserService.user.dto.RegistrationDTO;
 
+import com.UserService.user.dto.UserResponseDTO;
+import com.UserService.user.exception.DuplicateResourceException;
+import com.UserService.user.mapper.UserMapper;
 import com.UserService.user.model.User;
 import com.UserService.user.repo.UserRepository;
 import jakarta.transaction.Transactional;
@@ -16,24 +19,27 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public User register(RegistrationDTO dto) {
+    public UserResponseDTO register(RegistrationDTO dto) {
         if (usernameExist(dto.getUsername())){
-            throw new RuntimeException("Username already exist");
+            throw new DuplicateResourceException("Username already exist");
         }
         if (emailExist(dto.getEmail())){
-            throw new RuntimeException("Email already exist");
+            throw new DuplicateResourceException("Email already exist");
         }
         if (phoneExist(dto.getPhoneNumber())){
-            throw new RuntimeException("Phone number already used");
+            throw new DuplicateResourceException("Phone number already used");
         }
 
         if (nationalIdExist(dto.getNationalId())){
-            throw new RuntimeException("National id already used");
+            throw new DuplicateResourceException("National id already used");
         }
 
-        User user=dtoToEntity(dto);
-        return userRepository.save(user);
+        User user = UserMapper.toEntity(dto);
+        User saved = userRepository.save(user);
+        return UserMapper.toResponse(saved);
     }
+
+
     public User dtoToEntity(RegistrationDTO dto){
 
         User user=new User();
