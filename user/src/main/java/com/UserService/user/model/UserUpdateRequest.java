@@ -1,9 +1,7 @@
 package com.UserService.user.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.UserService.user.UpdateRequestStatus;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
@@ -17,11 +15,16 @@ public class UserUpdateRequest {
         @GeneratedValue
         private Long id;
 
+
+
         @Column(unique = true, nullable = false)
         private Long userId;
 
         @Column(nullable = false)
         private String firstName;
+
+        @Enumerated(EnumType.STRING)
+        private UpdateRequestStatus status= UpdateRequestStatus.PENDING;
 
         @Column(nullable = false)
         private String middleName;
@@ -37,7 +40,7 @@ public class UserUpdateRequest {
 
 
         @Column(nullable = false)
-        private LocalDateTime localDateTime;
+        private LocalDateTime updatedAt;
         @Column(nullable = false)
         private String address;
 }

@@ -3,6 +3,7 @@ package com.UserService.user.controller;
 import com.UserService.user.dto.RegistrationDTO;
 import com.UserService.user.dto.UpdateUserDto;
 import com.UserService.user.dto.UserResponseDTO;
+import com.UserService.user.model.User;
 import com.UserService.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,4 +32,6 @@ public class UserController {
                                                 @RequestBody UpdateUserDto updateUserDto){
         return ResponseEntity.ok(userService.updateUserDto(id,updateUserDto));
     }
+
+
 }

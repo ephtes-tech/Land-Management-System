@@ -1,5 +1,6 @@
 package com.UserService.user.service;
 
+import com.UserService.user.UpdateRequestStatus;
 import com.UserService.user.dto.RegistrationDTO;
 
 import com.UserService.user.dto.UpdateUserDto;
@@ -62,9 +63,32 @@ public class UserService {
         ur.setNationalId(dto.getNationalId());
         ur.setLastName(dto.getLastName());
         ur.setAddress(dto.getAddress());
-        ur.setLocalDateTime(LocalDateTime.now());
+        ur.setUpdatedAt(LocalDateTime.now());
         updateRepo.save(ur);
         return "Successful Update";
+    }
+    public UserResponseDTO approveUserUpdate(Long requestId){
+        UserUpdateRequest userUpdateRequest=updateRepo.findById(requestId).orElseThrow(
+                ()->new NotFoundException("User Not Found"));
+        if (userUpdateRequest.getStatus()== UpdateRequestStatus.APPROVED ||
+                userUpdateRequest.getStatus()==UpdateRequestStatus.REJECTED){
+            throw new IllegalStateException("Update request already processed");
+        }
+        User user=userRepository.findById(requestId).orElseThrow(()->
+                new NotFoundException("User not found"));
+        user.setAddress(userUpdateRequest.getAddress());
+        user.setFirstName(userUpdateRequest.getFirstName());
+        user.setLastName(userUpdateRequest.getLastName());
+        user.setMiddleName(userUpdateRequest.getMiddleName());
+        user.setPhoneNumber(userUpdateRequest.getPhoneNumber());
+        user.setNationalId(userUpdateRequest.getNationalId());
+        userRepository.save(user);
+
+        userUpdateRequest.setStatus(UpdateRequestStatus.APPROVED);
+        userUpdateRequest.setUpdatedAt(LocalDateTime.now());
+        updateRepo.save(userUpdateRequest);
+        return UserMapper.toResponse(user);
+
     }
 
 
