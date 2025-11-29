@@ -33,5 +33,13 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUserDto(id,updateUserDto));
     }
 
+    @PutMapping("/approve/{id}")
+    public ResponseEntity<UserResponseDTO> approve(@PathVariable Long id){
+        return ResponseEntity.ok(userService.approveUserUpdate(id));
+    }
+    @PutMapping("/rejected/{id}")
+    public ResponseEntity<String> reject(@PathVariable Long id){
+        return ResponseEntity.ok(userService.rejectUpdateRequest(id));
+    }
 
 }

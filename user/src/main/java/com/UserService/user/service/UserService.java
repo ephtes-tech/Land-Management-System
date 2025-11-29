@@ -52,6 +52,8 @@ public class UserService {
         return UserMapper.toResponse(user);
     }
 
+
+    @Transactional
     public String updateUserDto(Long id,UpdateUserDto dto){
         UserUpdateRequest ur=new UserUpdateRequest();
         User user=userRepository.findById(id).orElseThrow(
@@ -67,6 +69,8 @@ public class UserService {
         updateRepo.save(ur);
         return "Successful Update";
     }
+
+    @Transactional
     public UserResponseDTO approveUserUpdate(Long requestId){
         UserUpdateRequest userUpdateRequest=updateRepo.findById(requestId).orElseThrow(
                 ()->new NotFoundException("User Not Found"));
@@ -89,6 +93,22 @@ public class UserService {
         updateRepo.save(userUpdateRequest);
         return UserMapper.toResponse(user);
 
+    }
+
+    @Transactional
+    public String rejectUpdateRequest(Long requestId) {
+        UserUpdateRequest request = updateRepo.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("Update request not found"));
+
+        if (request.getStatus()== UpdateRequestStatus.APPROVED ||
+                request.getStatus()==UpdateRequestStatus.REJECTED) {
+            throw new IllegalStateException("Update request already processed");
+        }
+
+        request.setStatus(UpdateRequestStatus.REJECTED);
+        request.setUpdatedAt(LocalDateTime.now());
+        updateRepo.save(request);
+        return "Rejected Successfully";
     }
 
 
