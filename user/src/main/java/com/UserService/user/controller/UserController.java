@@ -3,13 +3,17 @@ package com.UserService.user.controller;
 import com.UserService.user.dto.RegistrationDTO;
 import com.UserService.user.dto.UpdateUserDto;
 import com.UserService.user.dto.UserResponseDTO;
-import com.UserService.user.model.User;
+import com.UserService.user.model.UserUpdateRequest;
 import com.UserService.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
@@ -27,11 +31,13 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateProfile(@PathVariable Long id,
-                                                @RequestBody UpdateUserDto updateUserDto){
-        return ResponseEntity.ok(userService.updateUserDto(id,updateUserDto));
+    @PostMapping("/updateRequest")
+    public ResponseEntity<UserUpdateRequest> updateProfile(@RequestBody UpdateUserDto dto){
+
+        return ResponseEntity.ok(userService.updateUserDto(dto));
     }
+
+
 
     @PutMapping("/approve/{id}")
     public ResponseEntity<UserResponseDTO> approve(@PathVariable Long id){
@@ -40,6 +46,15 @@ public class UserController {
     @PutMapping("/rejected/{id}")
     public ResponseEntity<String> reject(@PathVariable Long id){
         return ResponseEntity.ok(userService.rejectUpdateRequest(id));
+    }
+    @GetMapping("/getUsers")
+    public ResponseEntity<List<UserResponseDTO>> allUser(){
+        log.info("calling get all user");
+        return ResponseEntity.ok(userService.gellAllUser());
+    }
+    @GetMapping("/listPending")
+    public ResponseEntity<List<UserUpdateRequest>> pendings(){
+        return ResponseEntity.ok(userService.getPending());
     }
 
 }

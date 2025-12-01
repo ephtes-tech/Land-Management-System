@@ -1,4 +1,4 @@
-package com.UserService.user;
+package com.UserService.user.status;
 
 public enum UpdateRequestStatus {
     PENDING,

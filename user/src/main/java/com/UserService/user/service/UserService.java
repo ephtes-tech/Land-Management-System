@@ -1,6 +1,6 @@
 package com.UserService.user.service;
 
-import com.UserService.user.UpdateRequestStatus;
+import com.UserService.user.status.UpdateRequestStatus;
 import com.UserService.user.dto.RegistrationDTO;
 
 import com.UserService.user.dto.UpdateUserDto;
@@ -14,11 +14,15 @@ import com.UserService.user.repo.UpdateRepo;
 import com.UserService.user.repo.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -45,6 +49,10 @@ public class UserService {
         User saved = userRepository.save(user);
         return UserMapper.toResponse(saved);
     }
+    public List<UserResponseDTO> gellAllUser(){
+        return userRepository.findAll().stream().map(UserMapper::toResponse)
+                .collect(Collectors.toList());
+    }
 
     public UserResponseDTO getUserById(Long id){
         User user=userRepository.findById(id)
@@ -54,11 +62,13 @@ public class UserService {
 
 
     @Transactional
-    public String updateUserDto(Long id,UpdateUserDto dto){
+    public UserUpdateRequest updateUserDto(UpdateUserDto dto){
         UserUpdateRequest ur=new UserUpdateRequest();
-        User user=userRepository.findById(id).orElseThrow(
-                ()->new NotFoundException("User not found"));
-        ur.setId(user.getUserId());
+        log.info("Created user update request");
+        if(!userRepository.existsById(dto.getUserId())){
+            throw new NotFoundException("User not found");
+        }
+        ur.setUserId(dto.getUserId());
         ur.setFirstName(dto.getFirstName());
         ur.setMiddleName(dto.getMiddleName());
         ur.setPhoneNumber(dto.getPhoneNumber());
@@ -66,8 +76,10 @@ public class UserService {
         ur.setLastName(dto.getLastName());
         ur.setAddress(dto.getAddress());
         ur.setUpdatedAt(LocalDateTime.now());
-        updateRepo.save(ur);
-        return "Successful Update";
+        log.info("seted ur from dto");
+
+        log.info("saved to update repo");
+        return updateRepo.save(ur);
     }
 
     @Transactional
@@ -95,6 +107,9 @@ public class UserService {
 
     }
 
+    public List<UserUpdateRequest> getPending(){
+        return updateRepo.findByStatus(UpdateRequestStatus.PENDING);
+    }
     @Transactional
     public String rejectUpdateRequest(Long requestId) {
         UserUpdateRequest request = updateRepo.findById(requestId)
