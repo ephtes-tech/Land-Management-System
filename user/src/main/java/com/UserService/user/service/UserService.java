@@ -1,5 +1,6 @@
 package com.UserService.user.service;
 
+import com.UserService.user.exception.KeyCloakCreationException;
 import com.UserService.user.status.UpdateRequestStatus;
 import com.UserService.user.dto.RegistrationDTO;
 
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final UpdateRepo updateRepo;
+    private final KeyCloakService keyCloakService;
 
     @Transactional
     public UserResponseDTO register(RegistrationDTO dto) {
@@ -50,7 +52,16 @@ public class UserService {
             throw new DuplicateResourceException("National id already used");
         }
 
+        String kcUserId;
+        try {
+            kcUserId=keyCloakService.registerUser(dto.getUsername(),dto.getEmail(),
+                    dto.getPassword());
+        } catch (KeyCloakCreationException ke) {
+            throw ke;
+        }
+
         User user = UserMapper.toEntity(dto);
+        user.setKeycloakId(kcUserId);
         User saved = userRepository.save(user);
         return UserMapper.toResponse(saved);
     }

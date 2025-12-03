@@ -19,6 +19,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long userId;
 
+    @Column(unique = true, nullable = false)
+    private String keycloakId;
+
     @Column(unique = true , nullable = false)
     private String username;
 

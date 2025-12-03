@@ -4,6 +4,7 @@ import com.UserService.user.dto.RegistrationDTO;
 import com.UserService.user.dto.UpdateUserDto;
 import com.UserService.user.dto.UserResponseDTO;
 import com.UserService.user.model.UserUpdateRequest;
+import com.UserService.user.service.KeyCloakService;
 import com.UserService.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody RegistrationDTO registrationDto){
+
         UserResponseDTO dto=userService.register(registrationDto);
         return ResponseEntity.ok(dto);
     }
