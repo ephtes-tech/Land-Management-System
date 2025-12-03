@@ -64,6 +64,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    //Triggered when the keycloak registration service failed
+    @ExceptionHandler(KeyCloakCreationException.class)
+    public ResponseEntity<ApiError> keycloakFailed(KeyCloakCreationException ex,
+                                                   HttpServletRequest request){
+        ApiError error=ApiError.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .code("Keycloak_Error")
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
     //Triggered when the database rejects an insert/update (e.g., duplicate email because of unique constraint)
 
     @ExceptionHandler(DataIntegrityViolationException.class)
