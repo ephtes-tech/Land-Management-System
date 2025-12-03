@@ -33,7 +33,7 @@ server:
       com:
         UserService:
           user: INFO
-
+default-role: user
 
 
 

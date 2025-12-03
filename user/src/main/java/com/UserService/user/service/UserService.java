@@ -12,9 +12,14 @@ import com.UserService.user.model.User;
 import com.UserService.user.model.UserUpdateRequest;
 import com.UserService.user.repo.UpdateRepo;
 import com.UserService.user.repo.UserRepository;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.keycloak.OAuth2Constants;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

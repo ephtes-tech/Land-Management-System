@@ -33,7 +33,6 @@ public class UserController {
 
     @PostMapping("/updateRequest")
     public ResponseEntity<UserUpdateRequest> updateProfile(@RequestBody UpdateUserDto dto){
-
         return ResponseEntity.ok(userService.updateUserDto(dto));
     }
 
