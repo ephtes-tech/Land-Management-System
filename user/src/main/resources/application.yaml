@@ -17,9 +17,16 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+keycloak:
+  server-url: http://localhost:8080
+  realm: land-management
+  username: admin
+  password: admin
+  client-id: registration-auth-flow
+  client-secret: umsQgCZL1UcQLGlhCy4Ozqs3pGAZ1tAh
+
 server:
   port: 8081
-
   logging:
     level:
       root: INFO
@@ -27,11 +34,8 @@ server:
         UserService:
           user: INFO
 
-keycloak:
-  server-url: http://localhost:8080
-  realm: land-management
-  client-id: registration-auth-flow
-  client-secret: umsQgCZL1UcQLGlhCy4Ozqs3pGAZ1tAh
+
+
 
 
 
