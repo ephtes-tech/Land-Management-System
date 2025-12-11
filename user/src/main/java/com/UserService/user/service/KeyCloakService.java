@@ -2,12 +2,15 @@ package com.UserService.user.service;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.core.Response;
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.OAuth2Constants;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,18 +19,26 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
+
 @Service
 public class KeyCloakService {
-
     private static final Logger log = LoggerFactory.getLogger(KeyCloakService.class);
+
+
+
     @Value("${keycloak.server-url}")
-    private static String serverUrl;
+    private String serverUrl;          // http://localhost:8080
 
     @Value("${keycloak.realm}")
-    private String realm;
+    private String realm;              // Land-Management
 
     @Value("${keycloak.client-id}")
-    private String clientId;
+    private String clientId;           // registration-auth-flow
+
+    @Value("${keycloak.client-secret}")
+    private String clientSecret;
+
+
 
     @Value("${keycloak.username}")
     private String adminUsername;
@@ -38,50 +49,83 @@ public class KeyCloakService {
     @Value("${keycloak.default-role:user}") // default role if not provided
     private String defaultRole;
 
-    @Value("${keycloak.client-secret}")
-    private String clientSecret;
 
     private Keycloak keycloak;
     @PostConstruct
     public void init(){
-        this.keycloak= KeycloakBuilder.builder()
-                .serverUrl(serverUrl)
-                .realm(realm)
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .grantType(OAuth2Constants.CLIENT_CREDENTIALS).build();
-        log.info("Connected to Keycloak realm: {}", realm);
+        // Create a Keycloak admin client instance using client credentials (client ID + secret)
+        // This client will act as a "service account" that has permissions to create user
+        this.keycloak = KeycloakBuilder.builder()
+                .serverUrl("http://localhost:8080")              // http://localhost:8080
+                .realm("Land-Management")                      // authenticate against Land-Management
+                .clientId("land-admin-client")
+                .clientSecret("HxpzhU5WXiXQs7QioNn7AhxiFGUdXXit")
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                .build();
+        log.info("Keycloak admin client initialized for realm {}", realm);
     }
-    public String registerUser(String username,String email, String password){
-        UsersResource resource=keycloak.realm(realm).users();
+    public void registerUser(String username,String email, String password){
 
-        // Create password credential
-        CredentialRepresentation credentialRepresentation=new CredentialRepresentation();
-        credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
-        credentialRepresentation.setValue(password);
-        credentialRepresentation.setTemporary(false);
+        log.info("registerUser() called for username={}", username);
 
-        //Build User
-        UserRepresentation user=new UserRepresentation();
-        user.setEmail(email);
+        UserRepresentation user = new UserRepresentation();
         user.setUsername(username);
+        user.setEmail(email);
         user.setEnabled(true);
-        user.setCredentials(Collections.singletonList(credentialRepresentation));
 
-        //Create user
-        Response response=resource.create(user);
-        if (response.getStatus()!=201){
-            throw new RuntimeException("failed to create user: "+response.getStatusInfo());
+        log.info("Sending create user request to Keycloak...");
+        Response response=keycloak.realm(realm).users().create(user);
+
+        String userId= CreatedResponseUtil.getCreatedId(response);
+
+        CredentialRepresentation credential = new CredentialRepresentation();
+        credential.setType(CredentialRepresentation.PASSWORD);
+        credential.setValue(password);
+        credential.setTemporary(false);
+        log.info("CredentialRepresentation built");
+        keycloak.realm("Land-Management").
+                users().get(userId).resetPassword(credential);
+        RoleRepresentation userRole=keycloak.realm("Land-Management").roles().get("USER")
+                .toRepresentation();
+        keycloak.realm("Land-Management").users().get(userId).roles().realmLevel().add(Collections.singletonList(userRole));
+        log.info("Status: {} ",response.getStatus());
+        /*UsersResource users;
+        try {
+            users = keycloak.realm(realm).users();
+            log.info("UsersResource resolved successfully.");
+        } catch (Exception e) {
+            log.error("Failed to resolve UsersResource for realm {}", realm, e);
+            throw new RuntimeException("Cannot access Keycloak users API: " + e.getMessage(), e);
         }
-        String userId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
-        log.info("User created: {}", userId);
+        // password credential
+
+
+
+
+        log.info("UserRepresentation built");
+
+
+        int status = response.getStatus();
+        log.info("Keycloak responded with status = {}", status);
+
+        if (status != 201) {
+            String body = null;
+            try {
+                body = response.readEntity(String.class);
+            } catch (Exception ignored) {}
+            log.error("Keycloak error body: {}", body);
+            throw new RuntimeException("Failed to create user in Keycloak. HTTP " + status);
+        }
+
+
+
 
         //assign role
-        assignRole(userId,defaultRole);
-        return userId;
+       // assignRole(userId,defaultRole);
+        */
     }
     public void assignRole(String userId, String roleName) {
-        var roles = keycloak.realm(realm).roles();
+        var roles = keycloak.realm("realm").roles();
         var role = roles.get(roleName).toRepresentation();
 
         keycloak.realm(realm).users()

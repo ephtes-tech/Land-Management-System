@@ -3,7 +3,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/land-management
+          issuer-uri: http://localhost:8080/realms/Land-Management
+
   datasource:
     url: jdbc:postgresql://localhost:5433/land_management
     username: admin
@@ -19,20 +20,18 @@ spring:
 
 keycloak:
   server-url: http://localhost:8080
-  realm: land-management
-  username: admin
+  realm: Land-Management
+  username: admin_new
   password: admin
-  client-id: registration-auth-flow
-  client-secret: umsQgCZL1UcQLGlhCy4Ozqs3pGAZ1tAh
+  client-id: land-admin-client
+  client-secret: HxpzhU5WXiXQs7QioNn7AhxiFGUdXXit
 
 server:
   port: 8081
   logging:
     level:
       root: INFO
-      com:
-        UserService:
-          user: INFO
+      com.UserService.user: INFO
 default-role: user
 
 

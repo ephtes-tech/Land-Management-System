@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: land-parcel-service

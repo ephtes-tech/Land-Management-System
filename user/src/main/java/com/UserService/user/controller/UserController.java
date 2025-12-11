@@ -22,10 +22,10 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody RegistrationDTO registrationDto){
+    public ResponseEntity<String> register(@Valid @RequestBody RegistrationDTO registrationDto){
 
-        UserResponseDTO dto=userService.register(registrationDto);
-        return ResponseEntity.ok(dto);
+      userService.register(registrationDto);
+        return ResponseEntity.ok("Succesful");
     }
 
     @GetMapping("/{id}")

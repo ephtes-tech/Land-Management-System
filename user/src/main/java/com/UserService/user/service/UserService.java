@@ -36,34 +36,34 @@ public class UserService {
     private final UpdateRepo updateRepo;
     private final KeyCloakService keyCloakService;
 
-    @Transactional
-    public UserResponseDTO register(RegistrationDTO dto) {
-        if (usernameExist(dto.getUsername())){
-            throw new DuplicateResourceException("Username already exist");
-        }
-        if (emailExist(dto.getEmail())){
-            throw new DuplicateResourceException("Email already exist");
-        }
-        if (phoneExist(dto.getPhoneNumber())){
-            throw new DuplicateResourceException("Phone number already used");
-        }
 
-        if (nationalIdExist(dto.getNationalId())){
-            throw new DuplicateResourceException("National id already used");
-        }
-
-        String kcUserId;
-        try {
-            kcUserId=keyCloakService.registerUser(dto.getUsername(),dto.getEmail(),
+    public void register(RegistrationDTO dto) {
+       validateUniqueness(dto);
+       log.info("Validation uniquness ");
+       keyCloakService.registerUser(dto.getUsername(),dto.getEmail(),
                     dto.getPassword());
-        } catch (KeyCloakCreationException ke) {
-            throw ke;
-        }
+        log.info("keycloak regiteration successful ");
 
-        User user = UserMapper.toEntity(dto);
+        /*User user = UserMapper.toEntity(dto);
         user.setKeycloakId(kcUserId);
         User saved = userRepository.save(user);
-        return UserMapper.toResponse(saved);
+        return UserMapper.toResponse(saved);*/
+    }
+
+    private void validateUniqueness(RegistrationDTO registrationDTO){
+        if (userRepository.existsByPhoneNumber(registrationDTO.getPhoneNumber())){
+            throw new DuplicateResourceException("Phone number already exist");
+        }
+        if (userRepository.existsByNationalId(registrationDTO.getNationalId())){
+            throw new DuplicateResourceException("National id already exist");
+        }
+        if (userRepository.existsByUsername(registrationDTO.getUsername())){
+            throw new DuplicateResourceException("Username already exist");
+        }
+        if (userRepository.existsByEmail(registrationDTO.getEmail())){
+            throw new DuplicateResourceException("Email already exist");
+        }
+
     }
     public List<UserResponseDTO> gellAllUser(){
         return userRepository.findAll().stream().map(UserMapper::toResponse)
@@ -142,20 +142,4 @@ public class UserService {
         return "Rejected Successfully";
     }
 
-
-    public boolean usernameExist(String username){
-        return userRepository.existsByUsername(username);
-    }
-
-    public boolean nationalIdExist(String NationalId){
-        return userRepository.existsByNationalId(NationalId);
-    }
-
-    public boolean phoneExist(String phone){
-        return userRepository.existsByPhoneNumber(phone);
-    }
-
-    public boolean emailExist(String email){
-        return userRepository.existsByEmail(email);
-    }
 }
