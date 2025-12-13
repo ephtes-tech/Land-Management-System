@@ -2,6 +2,7 @@ package com.landmanagement.land_parcel_service.model;
 
 import com.landmanagement.land_parcel_service.enumirator.LandType;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import org.locationtech.jts.geom.Polygon;
 
@@ -9,6 +10,7 @@ import java.time.OffsetDateTime;
 
 @Entity
 @Data
+@Builder
 public class Land {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
