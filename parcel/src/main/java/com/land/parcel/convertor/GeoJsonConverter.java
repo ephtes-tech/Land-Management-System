@@ -1,4 +1,4 @@
-package com.land.parcel.configuration;
+package com.land.parcel.convertor;
 
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.geojson.GeoJsonReader;
@@ -18,6 +18,9 @@ public class GeoJsonConverter {
                 throw new IllegalArgumentException("Geometry is empty");
             }
 
+            geometry=force2D(geometry);
+            geometry.setSRID(4326);
+
             // Polygon
             if (geometry instanceof Polygon polygon) {
                 polygon.setSRID(4326);
@@ -28,6 +31,7 @@ public class GeoJsonConverter {
             // MultiPolygon → union
             if (geometry instanceof MultiPolygon multiPolygon) {
                 Geometry union = multiPolygon.union();
+                union=force2D(union);
                 if (!(union instanceof Polygon)) {
                     throw new IllegalArgumentException("MultiPolygon cannot be merged into a Polygon");
                 }
@@ -44,6 +48,11 @@ public class GeoJsonConverter {
         } catch (Exception e) {
             throw new RuntimeException("Invalid GeoJSON -> Polygon conversion", e);
         }
+    }
+    private Geometry force2D(Geometry geometry) {
+        Geometry copy = (Geometry) geometry.copy();
+        copy.apply((CoordinateFilter) coord -> coord.setZ(Double.NaN));
+        return copy;
     }
 
     private void validate(Polygon polygon) {

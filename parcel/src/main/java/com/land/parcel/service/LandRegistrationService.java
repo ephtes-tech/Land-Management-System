@@ -1,9 +1,8 @@
 package com.land.parcel.service;
 
-import com.land.parcel.configuration.GeoJsonConverter;
+import com.land.parcel.convertor.GeoJsonConverter;
 import com.land.parcel.dto.LandRequestDto;
 import com.land.parcel.dto.LandResponseDto;
-import com.land.parcel.enumr.LandType;
 import com.land.parcel.model.Land;
 import com.land.parcel.repository.LandRepo;
 import jakarta.transaction.Transactional;
