@@ -1,10 +1,10 @@
-package com.landmanagement.land_parcel_service;
+package com.land.parcel;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class LandParcelServiceApplicationTests {
+class ParcelApplicationTests {
 
 	@Test
 	void contextLoads() {
