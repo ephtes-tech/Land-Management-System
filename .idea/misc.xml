@@ -7,7 +7,13 @@
         <option value="$PROJECT_DIR$/user/pom.xml" />
         <option value="$PROJECT_DIR$/land-parcel-service/land-parcel-service/pom.xml" />
         <option value="$PROJECT_DIR$/land-parcel-service/pom.xml" />
+        <option value="$PROJECT_DIR$/parcel/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/land-parcel-service/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="25" project-jdk-type="JavaSDK">

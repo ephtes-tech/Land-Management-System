@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Data
 @Builder
-public class ApiError {
+public class ApiResponse {
     private LocalDateTime timestamp;
     private int status;
     private String message;

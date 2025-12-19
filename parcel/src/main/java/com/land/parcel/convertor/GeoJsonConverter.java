@@ -1,5 +1,6 @@
 package com.land.parcel.convertor;
 
+import com.land.parcel.exception.InvalidGeometryException;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.geojson.GeoJsonReader;
 import org.springframework.stereotype.Component;
@@ -57,10 +58,10 @@ public class GeoJsonConverter {
 
     private void validate(Polygon polygon) {
         if (!polygon.isValid()) {
-            throw new IllegalArgumentException("Invalid polygon (self-intersection)");
+            throw new InvalidGeometryException("Invalid polygon (self-intersection)");
         }
         if (polygon.getArea() <= 0) {
-            throw new IllegalArgumentException("Polygon area must be greater than zero");
+            throw new InvalidGeometryException("Polygon area must be greater than zero");
         }
     }
 }
