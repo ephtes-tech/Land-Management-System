@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 
 import java.time.OffsetDateTime;
@@ -36,8 +37,8 @@ public class Land {
         @Column(nullable = false)
         private LandType landType;
 
-        @Column(columnDefinition = "geometry(Polygon,4326)", nullable = false)
-        private Polygon coordinates;
+        @Column(columnDefinition = "geometry(MultiPolygon,4326)", nullable = false)
+        private MultiPolygon coordinates;
 
         @Column(nullable = false)
         private String description;

@@ -10,7 +10,7 @@ public class GeoJsonConverter {
     private final GeometryFactory geometryFactory =
             new GeometryFactory(new PrecisionModel(), 4326);
 
-    public Polygon toPolygon(String geoJson) {
+    public MultiPolygon toPolygon(String geoJson) {
         try {
             GeoJsonReader reader = new GeoJsonReader(geometryFactory);
             Geometry geometry = reader.read(geoJson);
@@ -26,20 +26,14 @@ public class GeoJsonConverter {
             if (geometry instanceof Polygon polygon) {
                 polygon.setSRID(4326);
                 validate(polygon);
-                return polygon;
+                return geometryFactory.createMultiPolygon(new Polygon[]{polygon});
             }
 
-            // MultiPolygon → union
+
             if (geometry instanceof MultiPolygon multiPolygon) {
-                Geometry union = multiPolygon.union();
-                union=force2D(union);
-                if (!(union instanceof Polygon)) {
-                    throw new IllegalArgumentException("MultiPolygon cannot be merged into a Polygon");
-                }
-                Polygon polygon = (Polygon) union;
-                polygon.setSRID(4326);
-                validate(polygon);
-                return polygon;
+                multiPolygon.setSRID(4326);
+                validate(multiPolygon);
+                return multiPolygon;
             }
 
             throw new IllegalArgumentException(
@@ -56,11 +50,11 @@ public class GeoJsonConverter {
         return copy;
     }
 
-    private void validate(Polygon polygon) {
-        if (!polygon.isValid()) {
+    private void validate(Geometry geometry) {
+        if (!geometry.isValid()) {
             throw new InvalidGeometryException("Invalid polygon (self-intersection)");
         }
-        if (polygon.getArea() <= 0) {
+        if (geometry.getArea() <= 0) {
             throw new InvalidGeometryException("Polygon area must be greater than zero");
         }
     }

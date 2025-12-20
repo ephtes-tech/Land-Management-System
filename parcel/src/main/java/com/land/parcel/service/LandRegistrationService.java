@@ -7,6 +7,7 @@ import com.land.parcel.model.Land;
 import com.land.parcel.repository.LandRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ public class LandRegistrationService {
 
     @Transactional
     public LandResponseDto registerLand(LandRequestDto dto){
-        Polygon polygon=geoJsonConverter.toPolygon(dto.getCoordinates().toString());
+        MultiPolygon polygon=geoJsonConverter.toPolygon(dto.getCoordinates().toString());
         Land land=Land.builder()
                 .region(dto.getRegion())
                 .woreda(dto.getWoreda())
