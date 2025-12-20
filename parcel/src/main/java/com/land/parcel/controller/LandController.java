@@ -4,6 +4,7 @@ import com.land.parcel.dto.LandRequestDto;
 import com.land.parcel.dto.LandResponseDto;
 import com.land.parcel.model.Land;
 import com.land.parcel.service.LandRegistrationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +18,7 @@ public class LandController {
     private final LandRegistrationService landRegistrationService;
 
     @PostMapping("/registerLand")
-    public LandResponseDto register(@RequestBody LandRequestDto landRequestDto){
+    public LandResponseDto register(@Valid @RequestBody LandRequestDto landRequestDto){
         return landRegistrationService.registerLand(landRequestDto);
     }
 }
