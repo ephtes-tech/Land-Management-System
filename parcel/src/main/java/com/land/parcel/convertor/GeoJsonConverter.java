@@ -34,7 +34,7 @@ public class GeoJsonConverter {
             //Reject Empty geometry
             if (geometry == null) {
                 log.warn("GeoJson parsing resulted in null geometry");
-                throw new IllegalArgumentException("Geometry is empty");
+                throw new InvalidGeometryException("Geometry is empty");
             }
 
             //Force geometry to 2D (remove Z values)
@@ -61,14 +61,19 @@ public class GeoJsonConverter {
             //Unsupported geometry types
             log.error("Unsupported geometry type received: {}",geometry.getGeometryType());
 
-            throw new IllegalArgumentException(
+            throw new InvalidGeometryException(
                     "Unsupported geometry type: " + geometry.getGeometryType()
             );
 
-        } catch (Exception e) {
+        }catch (InvalidGeometryException e){
+            //Business-level exception -> bubble up
+            log.warn("Invalid geometry provided: {}",e.getMessage());
+            throw e;
+        }
+        catch (Exception e) {
             //Unexpected technical error
             log.error("Unexpected error during GeoJSON conversion",e);
-            throw new RuntimeException("Filed to parse GeoJSON geometry");
+            throw new InvalidGeometryException("Failed to parse GeoJSON geometry");
         }
     }
 
