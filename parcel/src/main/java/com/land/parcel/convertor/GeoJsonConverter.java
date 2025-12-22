@@ -4,7 +4,11 @@ import com.land.parcel.exception.InvalidGeometryException;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.geojson.GeoJsonReader;
+import org.locationtech.jts.io.geojson.GeoJsonWriter;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 
 /**
@@ -14,6 +18,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class GeoJsonConverter {
+    private final ObjectMapper objectMapper=new ObjectMapper();
     /**
      * GeometryFactory defines precision and spatial reference system.
      * SRID 4326 = WGS84 (latitude / longitude)
@@ -86,6 +91,33 @@ public class GeoJsonConverter {
         Geometry copy = (Geometry) geometry.copy();
         copy.apply((CoordinateFilter) coord -> coord.setZ(Double.NaN));
         return copy;
+    }
+
+    /**
+     *
+     * Converts a JTS MultiPolygon geometry into a JsonNode (GeoJSON) suitable for response DTOs.
+     * @param geometry geometry the JTS MultiPolygon to convert
+     * @return  a JsonNode representing the GeoJSON, or null if geometry is null
+     * @throws RuntimeException if conversion fails
+     */
+
+    public JsonNode toJsonNode(MultiPolygon geometry){
+        //return null if geometry is empty
+        if (geometry==null){
+            log.warn("Received null geometry, returning null JsonNode");
+            return null;
+        }
+        try {
+            // Convert MultiPolygon to GeoJSON string
+            String geoJson=new GeoJsonWriter().write(geometry);
+
+            //Parse GeoJSON string into JsonNode
+            return objectMapper.readTree(geoJson);
+        } catch (Exception  e) {
+            //Log full stack trace and throw RuntimeException
+            log.error("Failed to convert MultiPolygon to JsonNode. Geometry: {}",geometry,e);
+            throw new RuntimeException("Failed to convert geometry to GeoJSON",e);
+        }
     }
 
     /**

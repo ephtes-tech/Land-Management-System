@@ -8,12 +8,11 @@ import com.land.parcel.repository.LandRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.MultiPolygon;
-import org.locationtech.jts.geom.Polygon;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class LandRegistrationService {
+public class LandService {
     private final LandRepo landRepo;
     private final GeoJsonConverter geoJsonConverter;
 
@@ -37,7 +36,7 @@ public class LandRegistrationService {
                 .region(saved.getRegion())
                 .zone(saved.getZone())
                 .woreda(saved.getWoreda())
-                .kebele(land.getKebele())
+                .kebele(saved.getKebele())
                 .landType(saved.getLandType())
                 .description(saved.getDescription())
                 .build();
