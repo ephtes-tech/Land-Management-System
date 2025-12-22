@@ -33,4 +33,30 @@ public interface LandRepo extends JpaRepository<Land,Long> {
             @Param("lat") double lat
     );
 
+    @Query(value = """
+    SELECT *
+    FROM land l
+    WHERE ST_Within(l.coordinates, :boundary)
+      AND l.deleted = false
+    """, nativeQuery = true)
+    List<Land> findWithinBoundary(
+            @Param("boundary") Geometry boundary
+    );
+
+    @Query(value = """
+    SELECT *
+    FROM land l
+    WHERE ST_DWithin(
+        l.coordinates::geography,  -- updated column name
+        :geometry::geography,
+        :distance
+    )
+    AND l.deleted = false
+    """, nativeQuery = true)
+    List<Land> findNearbyLands(
+            @Param("geometry") Geometry geometry,
+            @Param("distance") double distanceMeters
+    );
+
+
 }
