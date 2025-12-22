@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.MultiPolygon;
-import org.locationtech.jts.geom.Polygon;
-
 import java.time.OffsetDateTime;
 
 @Entity
@@ -16,6 +14,7 @@ import java.time.OffsetDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class Land {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

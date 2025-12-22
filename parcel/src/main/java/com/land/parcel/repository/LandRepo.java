@@ -58,5 +58,7 @@ public interface LandRepo extends JpaRepository<Land,Long> {
             @Param("distance") double distanceMeters
     );
 
+    void delete(Long id);
+
 
 }
