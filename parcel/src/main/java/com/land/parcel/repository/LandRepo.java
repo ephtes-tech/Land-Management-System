@@ -65,4 +65,5 @@ public interface LandRepo extends JpaRepository<Land,Long> {
 
 
 
+
 }

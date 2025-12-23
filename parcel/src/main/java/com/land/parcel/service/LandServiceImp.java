@@ -9,7 +9,9 @@ import com.land.parcel.mapper.LandMapper;
 import com.land.parcel.model.Land;
 import com.land.parcel.repository.LandRepo;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.io.geojson.GeoJsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -102,19 +104,72 @@ public class LandServiceImp implements LandService  {
         log.info("Land soft-deleted with id={}", id);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<LandResponseDto> findContainingPoint(double lon, double lat) {
-        return List.of();
+        if (lon < -180 || lon > 180 || lat < -90 || lat > 90) {
+            throw new IllegalArgumentException("Invalid longitude or latitude");
+        }
+        List<Land> land=landRepo.findLandContainingPoint(lon,lat);
+
+        if (land==null){
+            throw new ResourceNotFoundException("Land has not found");
+        }
+        return land.stream().map(landMapper::toDto).toList();
     }
 
     @Override
     public List<LandResponseDto> findWithinBoundary(JsonNode boundary) {
-        return List.of();
+
+
+        if (boundary == null || boundary.isEmpty()) {
+            throw new InvalidGeometryException("Boundary GeoJSON must not be null or empty");
+        }
+
+        // JsonNode ➜ String ➜ MultiPolygon
+        MultiPolygon boundaryPolygon =
+                geoJsonConverter.toPolygon(boundary.toString());
+
+        List<Land> lands =
+                landRepo.findWithinBoundary(boundaryPolygon);
+
+        if (lands.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "No land parcels found within the given boundary"
+            );
+        }
+
+        return lands.stream()
+                .map(landMapper::toDto)
+                .toList();
     }
 
     @Override
     public List<LandResponseDto> findNearby(JsonNode geometry, double distanceMeters) {
-        return List.of();
+        if (geometry == null || geometry.isEmpty()) {
+            throw new InvalidGeometryException("Input geometry must not be null or empty");
+        }
+        if (distanceMeters <= 0) {
+            throw new IllegalArgumentException("Distance must be greater than zero");
+        }
+
+        //  Convert GeoJSON to MultiPolygon using your converter
+        MultiPolygon inputPolygon = geoJsonConverter.toPolygon(geometry.toString());
+
+        // Call repository
+        List<Land> lands = landRepo.findNearbyLands(inputPolygon, distanceMeters);
+
+        // Throw exception if no lands found
+        if (lands.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    String.format("No land parcels found within %.2f meters", distanceMeters)
+            );
+        }
+
+        // Map to DTO
+        return lands.stream()
+                .map(landMapper::toDto)
+                .toList();
     }
 
 
