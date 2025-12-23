@@ -8,14 +8,13 @@ import com.land.parcel.exception.ResourceNotFoundException;
 import com.land.parcel.mapper.LandMapper;
 import com.land.parcel.model.Land;
 import com.land.parcel.repository.LandRepo;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.JsonNode;
 
 import java.util.List;
 
@@ -55,7 +54,7 @@ public class LandServiceImp implements LandService  {
 
     @Override
     public LandResponseDto getLand(Long id) {
-        Land land= landRepo.findById(id).orElseThrow(()->
+        Land land= landRepo.findByLandIdAndDeletedFalse(id).orElseThrow(()->
                 new ResourceNotFoundException("Land not found with id: {}"+id));
         return landMapper.toDto(land);
     }
@@ -63,15 +62,12 @@ public class LandServiceImp implements LandService  {
     @Transactional(readOnly = true)
     @Override
     public List<LandResponseDto> getAllLands() {
-        return landRepo.findAll()
-                .stream()
-                .map(land -> landMapper.toDto(land))
-                .toList();
+        return landRepo.findAllByDeletedFalse().stream().map(landMapper::toDto).toList();
     }
 
     @Override
     public LandResponseDto updateLand(Long id, LandRequestDto dto) {
-        Land land=landRepo.findById(id).orElseThrow(
+        Land land=landRepo.findByLandIdAndDeletedFalse(id).orElseThrow(
                 ()->new ResourceNotFoundException("Land not found with id: {}"+id)
         );
 
@@ -94,14 +90,31 @@ public class LandServiceImp implements LandService  {
         land.setLandType(dto.getLandType());
         land.setDescription(dto.getDescription());
         land.setUpdatedBy(dto.getUpdatedBy());
-        landRepo.save(land);
-        return landMapper.toDto(land);
+
+        return landMapper.toDto(landRepo.save(land));
     }
 
     @Override
     public void deleteLand(Long id) {
-        landRepo.delete(id);
+        Land land=landRepo.findById(id).orElseThrow(()->new ResourceNotFoundException("Land not found with id: {}"+id));
+        land.setDeleted(true);
+        landRepo.save(land);
         log.info("Land soft-deleted with id={}", id);
+    }
+
+    @Override
+    public List<LandResponseDto> findContainingPoint(double lon, double lat) {
+        return List.of();
+    }
+
+    @Override
+    public List<LandResponseDto> findWithinBoundary(JsonNode boundary) {
+        return List.of();
+    }
+
+    @Override
+    public List<LandResponseDto> findNearby(JsonNode geometry, double distanceMeters) {
+        return List.of();
     }
 
 

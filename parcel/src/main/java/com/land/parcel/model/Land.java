@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.locationtech.jts.geom.MultiPolygon;
 import java.time.OffsetDateTime;
 
@@ -14,7 +16,6 @@ import java.time.OffsetDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Land {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,6 +54,9 @@ public class Land {
 
         @Column(name = "updated_at")
         private OffsetDateTime updatedAt;
+
+        @Column(nullable = false)
+        private boolean deleted=false;
 
         @PrePersist
         public void prePersist() {

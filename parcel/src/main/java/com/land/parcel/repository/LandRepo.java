@@ -7,8 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LandRepo extends JpaRepository<Land,Long> {
+    Optional<Land> findByLandIdAndDeletedFalse(Long id);
+
+    List<Land> findAllByDeletedFalse();
+
     @Query(value = """
         SELECT EXISTS (
             SELECT 1
@@ -58,7 +63,6 @@ public interface LandRepo extends JpaRepository<Land,Long> {
             @Param("distance") double distanceMeters
     );
 
-    void delete(Long id);
 
 
 }
